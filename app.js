@@ -20,8 +20,8 @@ app.use(cors({
         return callback(null, true)
     }
 }))
-
-app.use(express.json())
+    .use(express.json())
+    .use(express.urlencoded({extended:false}))
 
 const PORT = process.env.PORT || 3001
 
