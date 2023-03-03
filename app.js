@@ -8,7 +8,7 @@ let allowedOrigins = [
     'http://yourapp.com'
 ]
 
-let token = 'ccc', password = '123';
+let password = '123';
 
 app.use(cors({
     credentials: true,
@@ -51,7 +51,7 @@ app.get('/users', (req, res, next) => {
 
 app.post('/auth', (req, res, next) => {
     let user = users.filter(user => (user.name === req.body.user && password === req.body.pwd))
-    user[0]['token'] = token
+    // user[0]['token'] = token
     res.json(user)
 })
 
