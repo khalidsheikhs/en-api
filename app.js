@@ -3,8 +3,12 @@ const cors = require("cors")
 
 let app = express()
 
-let allowedOrigins = ['http://localhost:3000',
-    'http://yourapp.com']
+let allowedOrigins = [
+    'http://localhost:3000',
+    'http://yourapp.com'
+]
+
+let token = 'ccc', password = '123';
 
 app.use(cors({
     credentials: true,
@@ -25,15 +29,29 @@ app.use(cors({
 
 const PORT = process.env.PORT || 3001
 
-let posts = [{ "id": "1", "title": "abc abc abc"}, { "id": "2", "title": "cde cde cde"}]
-let users = [{ "id": "121", "name": "khalidsheikhs", "password": "12345", "accessToken": "12345", "roles": ["2001"] }, { "id": "122", "name": "naveedsheikhs", "password": "12345", "accessToken": "12345", "roles": ["2004"] }]
+let posts = [
+    { "id": "1", "title": "abc abc abc"},
+    { "id": "2", "title": "cde cde cde"}
+]
+
+let users = [
+    { "id": "121", "name": "khalidsheikhs", "roles": ["2001"] },
+    { "id": "122", "name": "naveedsheikhs", "roles": ["2004"] },
+    { "id": "123", "name": "farhadsheikhs", "roles": ["2003"] }
+]
 
 app.listen(PORT, () => {
     console.log(`Server up and running on port ${PORT}`)
 })
 
+app.get('/users', (req, res, next) => {
+    // req.headers.token = token;
+    res.json(users)
+})
+
 app.post('/auth', (req, res, next) => {
-    let user = users.filter(user => (user.name === req.body.user && user.password === req.body.pwd))
+    let user = users.filter(user => (user.name === req.body.user && password === req.body.pwd))
+    user[0]['token'] = token
     res.json(user)
 })
 
