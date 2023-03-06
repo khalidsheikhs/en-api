@@ -16,7 +16,43 @@ const users = [
 		"email": "khalid.saeed@eremnews.com",
 		"password": "$2a$10$jDUnQtg2oFbhY4AnlRafyOscVrii4ViLYKkLqwk8jvaDYDHdma236",
 		"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiMTIzIiwiZW1haWwiOiJhYmNAZ21haWwuY29tIiwiaWF0IjoxNjc4MDk0NTE2LCJleHAiOjE2NzgxMDE3MTZ9.RSjjwrvNTqgFUf5VLKhNERjP9vam2rXjwu-ajlAo6YM", 
-		"roles": ["admin"]
+		"roles": ["2001"]
+	},
+	{
+		"_id": "1",
+		"first_name": "abc",
+		"last_name": "abc",
+		"email": "abc@abc.com",
+		"password": "abc",
+		"token": "",
+		"roles": ["2004"]
+	},
+	{
+		"_id": "2",
+		"first_name": "cde",
+		"last_name": "cde",
+		"email": "cde@cde.com",
+		"password": "cde",
+		"token": "",
+		"roles": ["2004"]
+	},
+	{
+		"_id": "3",
+		"first_name": "efg",
+		"last_name": "efg",
+		"email": "efg@efg.com",
+		"password": "efg",
+		"token": "",
+		"roles": ["2004"]
+	},
+	{
+		"_id": "4",
+		"first_name": "ghi",
+		"last_name": "ghi",
+		"email": "ghi@ghi.com",
+		"password": "ghi",
+		"token": "",
+		"roles": ["2004"]
 	}
 ];
 
@@ -134,8 +170,20 @@ app.post("/login", async (req, res) => {
   }
 });
 
-app.get("/welcome", auth, (req, res) => {
-  res.status(200).send("Welcome 🙌 ");
+app.get("/users", auth, (req, res) => {
+  // res.status(200).send("Welcome 🙌 ");
+  let permittedValues = [];
+  for (let i = 0; i < users.length; i++) {
+    let user = {
+		"_id": users[i]['_id'],
+		"first_name": users[i]['first_name'],
+		"last_name": users[i]['last_name'],
+		"email": users[i]['email'],
+		"roles": users[i]['roles']
+	}
+    permittedValues.push(user);
+  } 
+  return res.status(200).json(permittedValues);
 });
 
 // This should be the last route else any after it won't work
