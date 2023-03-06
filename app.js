@@ -36,9 +36,17 @@ app.use(cors({
     .use(express.urlencoded({extended:false}))
 
 app.post('/auth', (req, res, next) => {
-    let user = users.filter(user => (user.name === req.body.user && password === req.body.pwd))
-    // user[0]['token'] = token
-    res.json(user)
+    let errorMessage = 'Not a valid user',
+        user = users.filter(user => {
+            if (user.name === req.body.user) {
+                if (password !== req.body.pwd) {
+                    errorMessage = 'Not a valid password for the selected user'
+                }
+                return (user.name === req.body.user && password === req.body.pwd)
+            } else return user.name === req.body.user
+        })
+    if (!user.length) res.status(400).json(errorMessage)
+    else res.json(user)
 })
 
 app.get('/users', (req, res, next) => {
