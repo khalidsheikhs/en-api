@@ -9,11 +9,15 @@ const app = express();
 
 // const User = require("./model/user");
 const users = [
-  { "first_name": "khalid", "last_name": "saeed", "email": "abc@gmail.com", "password": "123", "token": "", "roles": ["2001"] },
-  { "first_name": "naveed", "last_name": "saeed", "email": "cde@gmail.com", "password": "123", "token": "", "roles": ["2002"] },
-  { "first_name": "asad", "last_name": "saeed", "email": "efg@gmail.com", "password": "123", "token": "", "roles": ["2003"] },
-  { "first_name": "amjad", "last_name": "saeed", "email": "fgh@gmail.com", "password": "123", "token": "", "roles": ["2004"] },
-  { "first_name": "farhad", "last_name": "saeed", "email": "fgh@gmail.com", "password": "123", "token": "", "roles": ["2005"] }
+	{
+		"_id": "0", 
+		"first_name": "khalid",
+		"last_name": "saeed",
+		"email": "khalid.saeed@eremnews.com",
+		"password": "$2a$10$jDUnQtg2oFbhY4AnlRafyOscVrii4ViLYKkLqwk8jvaDYDHdma236",
+		"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiMTIzIiwiZW1haWwiOiJhYmNAZ21haWwuY29tIiwiaWF0IjoxNjc4MDk0NTE2LCJleHAiOjE2NzgxMDE3MTZ9.RSjjwrvNTqgFUf5VLKhNERjP9vam2rXjwu-ajlAo6YM", 
+		"roles": ["admin"]
+	}
 ];
 
 const auth = require("./middleware/auth");
@@ -53,7 +57,8 @@ app.post("/register", async (req, res) => {
     // check if user already exist
     // Validate if user exist in our database
     // const oldUser = await User.findOne({ email });
-    let oldUser = users.filter(user => user.email === email);
+    var oldUser = users.filter(user => user.email === email);
+	oldUser = oldUser[0];
 
     if (oldUser) {
       return res.status(409).send("User Already Exist. Please Login");
@@ -63,19 +68,20 @@ app.post("/register", async (req, res) => {
     const encryptedPassword = await bcrypt.hash(password, 10);
 
     // Create user in our database
-    const user = await User.create({
+    /*const user = await User.create({
       first_name,
       last_name,
       email: email.toLowerCase(), // sanitize: convert email to lowercase
       password: encryptedPassword,
-    });
+    });*/
+	let user = { _id: Math.floor(Math.random() * Date.now()), first_name, last_name, email: email.toLowerCase(), password: encryptedPassword };
 
     // Create token
     const token = jwt.sign(
       { user_id: user._id, email },
       process.env.TOKEN_KEY,
       {
-        expiresIn: "2h",
+        expiresIn: "1h",
       }
     );
     // save user token
@@ -100,6 +106,11 @@ app.post("/login", async (req, res) => {
     // Validate if user exist in our database
     // const user = await User.findOne({ email });
     let user = users.filter(user => user.email === email);
+	user = user[0];
+
+	if (!user) {
+		return res.status(400).json({ errors: [{ msg: "invalid credentials" }] });
+	}
 
     if (user && (await bcrypt.compare(password, user.password))) {
       // Create token
@@ -107,7 +118,7 @@ app.post("/login", async (req, res) => {
         { user_id: user._id, email },
         process.env.TOKEN_KEY,
         {
-          expiresIn: "2h",
+          expiresIn: "1h",
         }
       );
 
@@ -115,7 +126,7 @@ app.post("/login", async (req, res) => {
       user.token = token;
 
       // user
-      res.status(200).json(user);
+      return res.status(200).json(user);
     }
     res.status(400).send("Invalid Credentials");
   } catch (err) {
