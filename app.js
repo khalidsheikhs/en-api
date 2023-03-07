@@ -17,42 +17,6 @@ const users = [
 		"password": "$2a$10$jDUnQtg2oFbhY4AnlRafyOscVrii4ViLYKkLqwk8jvaDYDHdma236",
 		"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiMTIzIiwiZW1haWwiOiJhYmNAZ21haWwuY29tIiwiaWF0IjoxNjc4MDk0NTE2LCJleHAiOjE2NzgxMDE3MTZ9.RSjjwrvNTqgFUf5VLKhNERjP9vam2rXjwu-ajlAo6YM", 
 		"roles": ["2001"]
-	},
-	{
-		"_id": "1",
-		"first_name": "abc",
-		"last_name": "abc",
-		"email": "abc@abc.com",
-		"password": "abc",
-		"token": "",
-		"roles": ["2004"]
-	},
-	{
-		"_id": "2",
-		"first_name": "cde",
-		"last_name": "cde",
-		"email": "cde@cde.com",
-		"password": "cde",
-		"token": "",
-		"roles": ["2004"]
-	},
-	{
-		"_id": "3",
-		"first_name": "efg",
-		"last_name": "efg",
-		"email": "efg@efg.com",
-		"password": "efg",
-		"token": "",
-		"roles": ["2004"]
-	},
-	{
-		"_id": "4",
-		"first_name": "ghi",
-		"last_name": "ghi",
-		"email": "ghi@ghi.com",
-		"password": "ghi",
-		"token": "",
-		"roles": ["2004"]
 	}
 ];
 
@@ -87,17 +51,31 @@ app.post("/register", async (req, res) => {
 
     // Validate user input
     if (!(email && password && first_name && last_name)) {
-      res.status(400).send("All input is required");
+        return res.status(400).json({
+          success: "false",
+          message: "Inputs required",
+          error: {
+              statusCode: 400,
+              message: "You need to send all required fields to register user",
+          },
+      });
     }
 
     // check if user already exist
     // Validate if user exist in our database
     // const oldUser = await User.findOne({ email });
-    var oldUser = users.filter(user => user.email === email);
+    let oldUser = users.filter(user => user.email === email);
 	oldUser = oldUser[0];
 
     if (oldUser) {
-      return res.status(409).send("User Already Exist. Please Login");
+      return res.status(409).json({
+          success: "false",
+          message: "User already registered",
+          error: {
+              statusCode: 409,
+              message: "User is already registered you can login",
+          },
+      });
     }
 
     //Encrypt user password
@@ -137,16 +115,19 @@ app.post("/login", async (req, res) => {
 
     // Validate user input
     if (!(email && password)) {
-      res.status(400).send("All input is required");
+      return res.status(400).json({
+          success: "false",
+          message: "All inputs required",
+          error: {
+              statusCode: 400,
+              message: "Please enter user's email and password to login",
+          },
+      });
     }
     // Validate if user exist in our database
     // const user = await User.findOne({ email });
     let user = users.filter(user => user.email === email);
 	user = user[0];
-
-	if (!user) {
-		return res.status(400).json({ errors: [{ msg: "invalid credentials" }] });
-	}
 
     if (user && (await bcrypt.compare(password, user.password))) {
       // Create token
@@ -163,8 +144,16 @@ app.post("/login", async (req, res) => {
 
       // user
       return res.status(200).json(user);
+    } else {
+        return res.status(400).json({
+            success: "false",
+            message: "Invalid creditionals",
+            error: {
+                statusCode: 400,
+                message: "Please enter valid user information to login",
+            },
+        });
     }
-    res.status(400).send("Invalid Credentials");
   } catch (err) {
     console.log(err);
   }
@@ -173,13 +162,14 @@ app.post("/login", async (req, res) => {
 app.get("/users", auth, (req, res) => {
   // res.status(200).send("Welcome 🙌 ");
   let permittedValues = [];
-  for (let i = 0; i < users.length; i++) {
+  let count = 10;
+  for (let i = 0; i < count; i++) {
     let user = {
-		"_id": users[i]['_id'],
-		"first_name": users[i]['first_name'],
-		"last_name": users[i]['last_name'],
-		"email": users[i]['email'],
-		"roles": users[i]['roles']
+		"_id": Math.floor(Math.random() * Date.now()),
+		"first_name": 'first name ' + i,
+		"last_name": 'last name ' + i,
+		"email": 'email_' + i +'@email.com',
+		"roles": ['200'+i]
 	}
     permittedValues.push(user);
   } 
